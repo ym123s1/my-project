@@ -22,13 +22,11 @@ module.exports = async function handler(req, res) {
         console.error("No extra knowledge file found");
     }
 
-    // היתוך של כל המידע לבלוק טקסט אחד אגרסיבי וברור
     const combinedText = `הנחיות מערכת למענה:\n${systemInstructions}\n\nמידע עובדתי להסתמך עליו בלבד:\n${extraKnowledge}\n\nהודעת המשתמש הנוכחית שעליך לענות עליה:\n${text}`;
 
-    // מעבר למודל האוניברסלי
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + API_KEY.trim();
+    // התיקון הקריטי: מעבר למודל 2.5 העדכני והפעיל
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY.trim();
 
-    // מבנה נתונים פשוט ורזה שאי אפשר לדחות
     const payload = {
         "contents": [
             { "role": "user", "parts": [{ "text": combinedText }] }
