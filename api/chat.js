@@ -24,8 +24,8 @@ module.exports = async function handler(req, res) {
 
     const combinedText = `הנחיות מערכת למענה:\n${systemInstructions}\n\nמידע עובדתי להסתמך עליו בלבד:\n${extraKnowledge}\n\nהודעת המשתמש הנוכחית שעליך לענות עליה:\n${text}`;
 
-    // התיקון הקריטי: מעבר למודל 2.5 העדכני והפעיל
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY.trim();
+    // הכתובת תוקנה למודל שמופיע לך ספציפית ב-AI Studio
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + API_KEY.trim();
 
     const payload = {
         "contents": [
