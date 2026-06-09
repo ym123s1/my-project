@@ -30,12 +30,19 @@ module.exports = async function handler(req, res) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "system_instruction": { "parts": [{ "text": finalInstructions }] }, // כאן תוקנה השגיאה - הוספו סוגריים מרובעים
+                "systemInstruction": { "parts": [{ "text": finalInstructions }] }, // התיקון כאן
                 "contents": [{ "parts": [{ "text": text }] }]
             })
         });
 
         const data = await response.json();
+
+        // מלכודת השגיאות: אם גוגל סירב, נדפיס את הסיבה המדויקת
+        if (!response.ok) {
+            console.error("=== ERROR FROM GOOGLE ===");
+            console.error(JSON.stringify(data, null, 2));
+            return res.status(500).json({ error: 'Google rejected the request' });
+        }
 
         if (data.candidates && data.candidates.length > 0) {
             res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
@@ -43,6 +50,7 @@ module.exports = async function handler(req, res) {
             res.status(500).json({ error: 'Invalid response from Gemini' });
         }
     } catch (error) {
+        console.error("=== SERVER CRASH ===", error);
         res.status(500).json({ error: 'Server error' });
     }
 }
