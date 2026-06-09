@@ -22,18 +22,16 @@ module.exports = async function handler(req, res) {
         console.error("No extra knowledge file found");
     }
 
-    const finalInstructions = systemInstructions + "\nמידע נוסף:\n" + extraKnowledge;
-    
-    // השדרוג למודל Pro כדי לחתוך את קריסת ה-404
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + API_KEY.trim();
+    // היתוך של כל המידע לבלוק טקסט אחד אגרסיבי וברור
+    const combinedText = `הנחיות מערכת למענה:\n${systemInstructions}\n\nמידע עובדתי להסתמך עליו בלבד:\n${extraKnowledge}\n\nהודעת המשתמש הנוכחית שעליך לענות עליה:\n${text}`;
 
-    // מבנה נתונים אטום שעומד בכל התקנים של גוגל
+    // מעבר למודל האוניברסלי
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + API_KEY.trim();
+
+    // מבנה נתונים פשוט ורזה שאי אפשר לדחות
     const payload = {
-        "system_instruction": {
-            "parts": [{ "text": finalInstructions }]
-        },
         "contents": [
-            { "role": "user", "parts": [{ "text": text }] }
+            { "role": "user", "parts": [{ "text": combinedText }] }
         ]
     };
 
