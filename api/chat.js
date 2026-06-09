@@ -23,24 +23,30 @@ module.exports = async function handler(req, res) {
     }
 
     const finalInstructions = systemInstructions + "\nמידע נוסף:\n" + extraKnowledge;
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY.trim();
+
+    // בניית המידע המדויק שנשלח לגוגל
+    const payload = {
+        "system_instruction": {
+            "parts": [{ "text": finalInstructions }]
+        },
+        "contents": [
+            { "parts": [{ "text": text }] }
+        ]
+    };
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "systemInstruction": { "parts": [{ "text": finalInstructions }] }, // התיקון כאן
-                "contents": [{ "parts": [{ "text": text }] }]
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
 
-        // מלכודת השגיאות: אם גוגל סירב, נדפיס את הסיבה המדויקת
+        // מלכודת השגיאות במקרה של סירוב מגוגל
         if (!response.ok) {
-            console.error("=== ERROR FROM GOOGLE ===");
-            console.error(JSON.stringify(data, null, 2));
+            console.error("=== ERROR FROM GOOGLE ===", JSON.stringify(data, null, 2));
             return res.status(500).json({ error: 'Google rejected the request' });
         }
 
