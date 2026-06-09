@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ממשק צ'אט</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #d1d7db; display: flex; justify-content: center; }
+        .whatsapp-container { width: 100%; max-width: 450px; height: 100vh; background-color: #efeae2; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header { background-color: #008069; color: white; display: flex; align-items: center; padding: 10px 15px; z-index: 10; }
+        .profile-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-left: 15px; background-color: #ccc; }
+        .contact-info { flex-grow: 1; }
+        .contact-name { font-weight: 600; font-size: 16px; margin: 0; }
+        .contact-status { font-size: 12px; margin: 0; opacity: 0.8; }
+        .chat-body { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; line-height: 1.4; word-wrap: break-word; }
+        .message.incoming { background-color: #ffffff; align-self: flex-start; border-top-right-radius: 0; }
+        .message.outgoing { background-color: #d9fdd3; align-self: flex-end; border-top-left-radius: 0; }
+        .time { font-size: 10px; color: #667781; float: left; margin-top: 5px; margin-right: 15px; }
+        .input-area { background-color: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .input-field { flex-grow: 1; background-color: #ffffff; border: none; padding: 12px 15px; border-radius: 20px; outline: none; font-size: 15px; }
+        .send-btn { background-color: #00a884; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="whatsapp-container">
+        <div class="header">
+            <img src="מתכתב.jpg" alt="Profile" class="profile-pic">
+            <div class="contact-info">
+                <p class="contact-name">Israeli</p>
+                <p class="contact-status">מחובר/ת</p>
+            </div>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="message incoming">היי, איך אפשר לעזור?<span class="time"></span></div>
+        </div>
+        <div class="input-area">
+            <input type="text" class="input-field" id="msg-input" placeholder="הקלד/י הודעה...">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        const SYSTEM_INSTRUCTIONS = "אתה עוזר וירטואלי מקצועי. ענה קצר, לעניין ובעברית.";
+
+        document.getElementById('msg-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (text === '') return;
+
+            const chatBody = document.getElementById('chat-body');
+            appendMessage(text, 'outgoing');
+            input.value = '';
+
+            const typingMsg = appendMessage("מקליד/ה...", 'incoming');
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, systemInstructions: SYSTEM_INSTRUCTIONS })
+                });
+
+                const data = await response.json();
+                chatBody.removeChild(typingMsg);
+
+                if (data.reply) {
+                    appendMessage(data.reply, 'incoming');
+                } else {
+                    appendMessage("שגיאה במערכת.", 'incoming');
+                }
+            } catch (error) {
+                chatBody.removeChild(typingMsg);
+                appendMessage("תקלת תקשורת מול השרת.", 'incoming');
+            }
+        }
+
+        function appendMessage(text, type) {
+            const chatBody = document.getElementById('chat-body');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + type;
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            msgDiv.innerHTML = text.replace(/\n/g, '<br>') + '<span class="time">' + timeStr + '</span>';
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return msgDiv; 
+        }
+    </script>
+</body>
+</html>
