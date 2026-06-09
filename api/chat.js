@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const API_KEY = process.env.GEMINI_API_KEY; 
     
     if (!API_KEY) {
-        return res.status(500).json({ error: 'API key is missing' });
+        return res.status(500).json({ error: 'API key is missing in Vercel' });
     }
 
     const filePath = path.join(process.cwd(), 'api', 'knowledge.txt');
