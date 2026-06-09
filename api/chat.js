@@ -30,7 +30,7 @@ module.exports = async function handler(req, res) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "system_instruction": { "parts": { "text": finalInstructions } },
+                "system_instruction": { "parts": [{ "text": finalInstructions }] }, // כאן תוקנה השגיאה - הוספו סוגריים מרובעים
                 "contents": [{ "parts": [{ "text": text }] }]
             })
         });
