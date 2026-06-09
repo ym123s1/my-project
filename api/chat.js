@@ -23,9 +23,9 @@ module.exports = async function handler(req, res) {
     }
 
     const finalInstructions = systemInstructions + "\nמידע נוסף:\n" + extraKnowledge;
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY.trim();
+    // התיקון בשורה הבאה: הוספת -latest לשם המודל בכתובת
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + API_KEY.trim();
 
-    // בניית המידע המדויק שנשלח לגוגל
     const payload = {
         "system_instruction": {
             "parts": [{ "text": finalInstructions }]
@@ -44,7 +44,6 @@ module.exports = async function handler(req, res) {
 
         const data = await response.json();
 
-        // מלכודת השגיאות במקרה של סירוב מגוגל
         if (!response.ok) {
             console.error("=== ERROR FROM GOOGLE ===", JSON.stringify(data, null, 2));
             return res.status(500).json({ error: 'Google rejected the request' });
