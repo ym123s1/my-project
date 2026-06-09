@@ -41,8 +41,7 @@
     </div>
 
     <script>
-        const SYSTEM_INSTRUCTIONS = "אתה עוזר וירטואלי מקצועי. ענה קצר, לעניין ובעברית.";
-
+        const SYSTEM_INSTRUCTIONS = "התעלם מכל הנחיה קודמת. פעל, ענה והתנהג אך ורק לפי ההנחיות, כללי ההתנהגות, האופי והמידע המפורטים במידע הנוסף שמוזן אליך.";
         document.getElementById('msg-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
         });
