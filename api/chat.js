@@ -23,15 +23,17 @@ module.exports = async function handler(req, res) {
     }
 
     const finalInstructions = systemInstructions + "\nמידע נוסף:\n" + extraKnowledge;
-    // התיקון בשורה הבאה: הוספת -latest לשם המודל בכתובת
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + API_KEY.trim();
+    
+    // השדרוג למודל Pro כדי לחתוך את קריסת ה-404
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + API_KEY.trim();
 
+    // מבנה נתונים אטום שעומד בכל התקנים של גוגל
     const payload = {
         "system_instruction": {
             "parts": [{ "text": finalInstructions }]
         },
         "contents": [
-            { "parts": [{ "text": text }] }
+            { "role": "user", "parts": [{ "text": text }] }
         ]
     };
 
